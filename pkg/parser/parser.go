@@ -9,8 +9,8 @@ import (
 	"github.com/ef-tech/github-issue-tool/pkg/github"
 )
 
-func ParseIssuesFile(filepath string) ([]*github.Issue, error) {
-	file, err := os.Open(filepath)
+func ParseIssuesFile(filePath string) ([]*github.Issue, error) {
+	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file: %w", err)
 	}
