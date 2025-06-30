@@ -16,3 +16,8 @@ type Client interface {
 	CreateIssue(issue *Issue) error
 	GetRepository() (owner, name string)
 }
+
+type DependencyClient interface {
+	Client
+	UpdateIssueWithDependencies(issue *Issue, issueNumberMap map[string]int) error
+}
