@@ -5,6 +5,15 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.0.0/) に基づいており、
 このプロジェクトは [セマンティック バージョニング](https://semver.org/spec/v2.0.0.html) に準拠しています。
 
+## [0.1.2] - 2025-01-01
+
+### 修正
+
+- **バージョン表示の問題**
+  - `--version`フラグが正しいバージョン番号を表示するように修正
+  - `pkg/config/version.go`のバージョン定数を"0.1.0"から"0.1.2"に更新
+  - コードとリリース間のバージョン一貫性を確保
+
 ## [0.1.1] - 2025-01-01
 
 ### 修正
@@ -68,5 +77,6 @@
 - 循環依存検出を含む包括的なエラーハンドリング
 - GitHub CLIとAPI認証方法の両方のサポート
 
+[0.1.2]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.2
 [0.1.1]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.1
 [0.1.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.0

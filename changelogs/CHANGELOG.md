@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2025-01-01
+
+### Fixed
+
+- **Version Display Issue**
+  - Fixed `--version` flag to display the correct version number
+  - Updated version constant from "0.1.0" to "0.1.2" in `pkg/config/version.go`
+  - Ensures version consistency between code and releases
+
 ## [0.1.1] - 2025-01-01
 
 ### Fixed
@@ -68,5 +77,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive error handling including circular dependency detection
 - Support for both GitHub CLI and API authentication methods
 
+[0.1.2]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.2
 [0.1.1]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.1
 [0.1.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.0
