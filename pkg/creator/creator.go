@@ -83,6 +83,13 @@ func (c *Creator) CreateIssues(issues []*github.Issue) (*Result, error) {
 				URL:    fmt.Sprintf("https://github.com/owner/repo/issues/%d", issue.Number),
 			})
 		} else {
+			// Check and create missing labels if supported
+			if labelClient, ok := c.client.(github.LabelClient); ok {
+				if err := c.ensureLabelsExist(labelClient, issue.Labels); err != nil {
+					fmt.Printf("         WARNING: Failed to ensure labels exist: %v\n", err)
+				}
+			}
+
 			// Create the actual issue
 			if err := c.client.CreateIssue(issue); err != nil {
 				result.Errors = append(result.Errors, fmt.Errorf("failed to create issue %s: %w", issue.ID, err))
@@ -142,4 +149,61 @@ func truncateString(s string, maxLen int) string {
 		return s
 	}
 	return s[:maxLen] + "..."
+}
+
+// ensureLabelsExist checks if labels exist and creates them if they don't
+func (c *Creator) ensureLabelsExist(labelClient github.LabelClient, labels []string) error {
+	// Default label configurations
+	defaultLabels := map[string]struct {
+		description string
+		color       string
+	}{
+		"epic":         {"Epic issue", "d73a4a"},
+		"priority-high": {"High priority issue", "b60205"},
+		"priority-medium": {"Medium priority issue", "fbca04"},
+		"priority-low":  {"Low priority issue", "0e8a16"},
+		"setup":        {"Project setup", "7057ff"},
+		"foundation":   {"Foundation implementation", "006b75"},
+		"config":       {"Configuration implementation", "fef2c0"},
+		"provider":     {"Service provider implementation", "c2e0c6"},
+		"template":     {"Template implementation", "e99695"},
+		"engine":       {"Engine implementation", "f7c6c7"},
+		"command":      {"Command implementation", "c5def5"},
+		"init":         {"Initialization command", "bfd4f2"},
+		"entity":       {"Entity related", "d4c5f9"},
+		"generator":    {"Code generator", "fbca04"},
+		"feature":      {"New feature", "a2eeef"},
+		"bug":          {"Bug fix", "d73a4a"},
+		"enhancement":  {"Enhancement", "84b6eb"},
+		"documentation": {"Documentation", "0075ca"},
+		"testing":      {"Testing related", "d4edda"},
+	}
+
+	for _, label := range labels {
+		exists, err := labelClient.LabelExists(label)
+		if err != nil {
+			return fmt.Errorf("failed to check if label %s exists: %w", label, err)
+		}
+
+		if !exists {
+			config, hasDefault := defaultLabels[label]
+			var description, color string
+			
+			if hasDefault {
+				description = config.description
+				color = config.color
+			} else {
+				// Use generic defaults for unknown labels
+				description = fmt.Sprintf("Label: %s", label)
+				color = "cccccc"
+			}
+
+			fmt.Printf("         Creating missing label: %s\n", label)
+			if err := labelClient.CreateLabel(label, description, color); err != nil {
+				return fmt.Errorf("failed to create label %s: %w", label, err)
+			}
+		}
+	}
+
+	return nil
 }

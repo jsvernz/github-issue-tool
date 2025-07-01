@@ -121,6 +121,68 @@ func (c *CLIClient) AddComment(issueNumber int, comment string) error {
 	return nil
 }
 
+// CreateLabel creates a new label in the repository
+func (c *CLIClient) CreateLabel(name, description, color string) error {
+	args := []string{"label", "create", name}
+	
+	// Add repository if specified
+	if c.owner != "" && c.repo != "" {
+		args = append(args, "--repo", fmt.Sprintf("%s/%s", c.owner, c.repo))
+	}
+	
+	// Add description if provided
+	if description != "" {
+		args = append(args, "--description", description)
+	}
+	
+	// Add color if provided
+	if color != "" {
+		args = append(args, "--color", color)
+	}
+	
+	cmd := exec.Command("gh", args...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to create label %s: %w (output: %s)", name, err, string(output))
+	}
+	
+	return nil
+}
+
+// LabelExists checks if a label exists in the repository
+func (c *CLIClient) LabelExists(name string) (bool, error) {
+	args := []string{"label", "list", "--json", "name"}
+	
+	// Add repository if specified
+	if c.owner != "" && c.repo != "" {
+		args = append(args, "--repo", fmt.Sprintf("%s/%s", c.owner, c.repo))
+	}
+	
+	cmd := exec.Command("gh", args...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return false, fmt.Errorf("failed to list labels: %w (output: %s)", err, string(output))
+	}
+	
+	// Parse JSON output
+	var labels []struct {
+		Name string `json:"name"`
+	}
+	
+	if err := json.Unmarshal(output, &labels); err != nil {
+		return false, fmt.Errorf("failed to parse labels JSON: %w", err)
+	}
+	
+	// Check if label exists
+	for _, label := range labels {
+		if label.Name == name {
+			return true, nil
+		}
+	}
+	
+	return false, nil
+}
+
 // UpdateIssueWithDependencies updates an issue with dependency information
 func (c *CLIClient) UpdateIssueWithDependencies(issue *Issue, issueNumberMap map[string]int) error {
 	if len(issue.DependsOn) == 0 && len(issue.Blocks) == 0 && len(issue.Related) == 0 {

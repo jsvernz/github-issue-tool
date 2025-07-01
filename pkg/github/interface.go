@@ -17,6 +17,12 @@ type Client interface {
 	GetRepository() (owner, name string)
 }
 
+type LabelClient interface {
+	Client
+	CreateLabel(name, description, color string) error
+	LabelExists(name string) (bool, error)
+}
+
 type DependencyClient interface {
 	Client
 	UpdateIssueWithDependencies(issue *Issue, issueNumberMap map[string]int) error

@@ -9,6 +9,8 @@ A smart CLI tool for bulk creation of GitHub issues with dependency management.
 - **Bulk Issue Creation**: Load multiple issues from a text file
 - **Dependency Management**: Supports `Depends`, `Blocks`, and `Related` relationships between issues
 - **Smart Creation Order**: Automatically optimizes creation order based on dependencies
+- **Automatic Label Creation**: Automatically creates missing labels with predefined colors and descriptions
+- **Repository Targeting**: Specify target repository with `--repo` option
 - **Dry Run Mode**: Preview what will be created before actually creating issues
 - **Progress Display**: Shows detailed progress and error handling
 
@@ -36,6 +38,9 @@ go install github.com/ef-tech/github-issue-tool/cmd/github-issue-tool@latest
 # Create issues from a file
 github-issue-tool --file issues.txt
 
+# Create issues in a different repository
+github-issue-tool --file issues.txt --repo owner/repository-name
+
 # Dry run to preview what will be created
 github-issue-tool --file issues.txt --dry-run
 
@@ -46,6 +51,7 @@ github-issue-tool -f issues.txt -n
 ### Command Line Options
 
 - `--file, -f`: Path to the issues file (required)
+- `--repo`: Target repository in `owner/name` format (optional)
 - `--dry-run, -n`: Perform a dry run without creating issues
 - `--help, -h`: Show help message
 - `--version, -v`: Show version information
@@ -84,6 +90,27 @@ Another issue body.
   - `Blocks:` - IDs of issues this blocks
   - `Related:` - IDs of related issues
 - **Body**: Everything after the metadata fields is treated as the issue body
+
+### Automatic Label Creation
+
+The tool automatically creates missing labels when they don't exist in the target repository. It includes predefined configurations for common labels:
+
+**Priority Labels:**
+- `priority-high` (Red: #b60205)
+- `priority-medium` (Yellow: #fbca04) 
+- `priority-low` (Green: #0e8a16)
+
+**Type Labels:**
+- `epic` (Red: #d73a4a)
+- `feature` (Blue: #a2eeef)
+- `bug` (Red: #d73a4a)
+- `enhancement` (Purple: #84b6eb)
+- `documentation` (Blue: #0075ca)
+
+**Development Labels:**
+- `setup`, `foundation`, `config`, `provider`, `template`, `engine`, `command`, `init`, `entity`, `generator`, `testing`
+
+For unknown labels, the tool creates them with a generic gray color (#cccccc) and a descriptive name.
 
 ## Environment Setup
 
