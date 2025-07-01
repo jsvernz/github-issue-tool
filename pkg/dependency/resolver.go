@@ -58,7 +58,7 @@ func (r *Resolver) Validate() error {
 	return nil
 }
 
-// detectCycle uses DFS to detect circular dependencies
+// detectCycle uses DFS to detect circular dependencies (DependsOn only)
 func (r *Resolver) detectCycle(id string, visited, recStack map[string]bool) error {
 	visited[id] = true
 	recStack[id] = true
@@ -74,32 +74,26 @@ func (r *Resolver) detectCycle(id string, visited, recStack map[string]bool) err
 		}
 	}
 
-	// Also check blocks relationships (reverse dependency)
-	for _, otherIssue := range r.issues {
-		for _, blockID := range otherIssue.Blocks {
-			if blockID == id {
-				if !visited[otherIssue.ID] {
-					if err := r.detectCycle(otherIssue.ID, visited, recStack); err != nil {
-						return err
-					}
-				} else if recStack[otherIssue.ID] {
-					return fmt.Errorf("circular dependency detected: %s blocks %s", otherIssue.ID, id)
-				}
-			}
-		}
-	}
+	// Blocks and Related relationships are not checked for cycles
 
 	recStack[id] = false
 	return nil
 }
 
 // GetCreationOrder returns issues in the order they should be created
+// Uses file order as primary sort, DependsOn relationships as secondary constraint
 func (r *Resolver) GetCreationOrder() ([]*github.Issue, error) {
 	if err := r.Validate(); err != nil {
 		return nil, err
 	}
 
-	// Topological sort using Kahn's algorithm
+	// Create position map to preserve original order
+	positionMap := make(map[string]int)
+	for i, issue := range r.issues {
+		positionMap[issue.ID] = i
+	}
+
+	// Topological sort using Kahn's algorithm with stable sorting
 	inDegree := make(map[string]int)
 	adjList := make(map[string][]string)
 
@@ -113,57 +107,60 @@ func (r *Resolver) GetCreationOrder() ([]*github.Issue, error) {
 		}
 	}
 
-	// Build dependency graph
+	// Build dependency graph - only consider DependsOn relationships
 	for _, issue := range r.issues {
-		// Handle DependsOn relationships
+		// Handle DependsOn relationships only
 		for _, depID := range issue.DependsOn {
 			adjList[depID] = append(adjList[depID], issue.ID)
 			inDegree[issue.ID]++
 		}
-
-		// Handle Blocks relationships (reverse)
-		for _, blockID := range issue.Blocks {
-			adjList[issue.ID] = append(adjList[issue.ID], blockID)
-			inDegree[blockID]++
-		}
-	}
-
-	// Find all nodes with no incoming edges (preserve original order)
-	queue := []string{}
-	for _, issue := range r.issues {
-		if inDegree[issue.ID] == 0 {
-			queue = append(queue, issue.ID)
-		}
+		
+		// Blocks and Related relationships are ignored for ordering
 	}
 
 	result := []*github.Issue{}
 	processedCount := 0
 
-	// Process queue
-	for len(queue) > 0 {
-		current := queue[0]
-		queue = queue[1:]
-
-		result = append(result, r.idToIssue[current])
-		processedCount++
-
-		// Reduce in-degree for neighbors (preserve original order)
-		readyNodes := []string{}
-		for _, neighbor := range adjList[current] {
-			inDegree[neighbor]--
-			if inDegree[neighbor] == 0 {
-				readyNodes = append(readyNodes, neighbor)
+	// Process all issues with stable topological sorting
+	for {
+		// Find all nodes with no incoming edges for this level
+		currentLevel := []string{}
+		for _, issue := range r.issues {
+			if inDegree[issue.ID] == 0 {
+				currentLevel = append(currentLevel, issue.ID)
 			}
 		}
-		
-		// Add ready nodes in original file order
-		for _, issue := range r.issues {
-			for _, ready := range readyNodes {
-				if issue.ID == ready {
-					queue = append(queue, ready)
-					break
+
+		if len(currentLevel) == 0 {
+			break
+		}
+
+		// Process current level one by one to maintain file order
+		// Select the earliest one in file order first
+		minPosition := len(r.issues)
+		selectedID := ""
+		for _, id := range currentLevel {
+			if pos := positionMap[id]; pos < minPosition {
+				minPosition = pos
+				selectedID = id
+			}
+		}
+
+		if selectedID != "" {
+			result = append(result, r.idToIssue[selectedID])
+			processedCount++
+
+			// Remove this node from consideration
+			inDegree[selectedID] = -1
+
+			// Reduce in-degree for neighbors
+			for _, neighbor := range adjList[selectedID] {
+				if inDegree[neighbor] > 0 {
+					inDegree[neighbor]--
 				}
 			}
+		} else {
+			break
 		}
 	}
 
