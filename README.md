@@ -19,13 +19,13 @@ A smart CLI tool for bulk creation of GitHub issues with dependency management.
 ```bash
 git clone https://github.com/ef-tech/github-issue-tool.git
 cd github-issue-tool
-go build -o github-issue-tool cmd/main.go
+go build -o github-issue-tool ./cmd/github-issue-tool
 ```
 
 ### Using Go Install
 
 ```bash
-go install github.com/ef-tech/github-issue-tool/cmd@latest
+go install github.com/ef-tech/github-issue-tool/cmd/github-issue-tool@latest
 ```
 
 ## Usage
@@ -205,7 +205,7 @@ github-issue-tool/
 ### Building
 
 ```bash
-go build -o github-issue-tool cmd/main.go
+go build -o github-issue-tool ./cmd/github-issue-tool
 ```
 
 ### Testing
