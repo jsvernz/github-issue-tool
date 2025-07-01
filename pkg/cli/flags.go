@@ -15,6 +15,7 @@ type Options struct {
 	ShowHelp  bool
 	ShowVersion bool
 	Repository string
+	NoSort    bool
 }
 
 func ParseFlags() (*Options, error) {
@@ -29,6 +30,7 @@ func ParseFlags() (*Options, error) {
 	flag.BoolVar(&opts.ShowVersion, "version", false, "Show version information")
 	flag.BoolVar(&opts.ShowVersion, "v", false, "Show version information (short form)")
 	flag.StringVar(&opts.Repository, "repo", "", "Target repository (owner/name format)")
+	flag.BoolVar(&opts.NoSort, "no-sort", false, "Create issues in file order without dependency sorting")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "%s - %s\n\n", config.AppName, config.AppDesc)
@@ -42,7 +44,9 @@ func ParseFlags() (*Options, error) {
 		fmt.Fprintf(os.Stderr, "  # Dry run to preview what will be created\n")
 		fmt.Fprintf(os.Stderr, "  %s --file issues.txt --dry-run\n\n", filepath.Base(os.Args[0]))
 		fmt.Fprintf(os.Stderr, "  # Using short form options\n")
-		fmt.Fprintf(os.Stderr, "  %s -f issues.txt -n\n", filepath.Base(os.Args[0]))
+		fmt.Fprintf(os.Stderr, "  %s -f issues.txt -n\n\n", filepath.Base(os.Args[0]))
+		fmt.Fprintf(os.Stderr, "  # Create issues in file order without dependency sorting\n")
+		fmt.Fprintf(os.Stderr, "  %s --file issues.txt --no-sort\n", filepath.Base(os.Args[0]))
 	}
 
 	flag.Parse()

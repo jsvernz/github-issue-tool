@@ -46,6 +46,9 @@ github-issue-tool --file issues.txt --dry-run
 
 # Using short form options
 github-issue-tool -f issues.txt -n
+
+# Create issues in file order without dependency sorting
+github-issue-tool --file issues.txt --no-sort
 ```
 
 ### Command Line Options
@@ -53,6 +56,7 @@ github-issue-tool -f issues.txt -n
 - `--file, -f`: Path to the issues file (required)
 - `--repo`: Target repository in `owner/name` format (optional)
 - `--dry-run, -n`: Perform a dry run without creating issues
+- `--no-sort`: Create issues in file order without dependency sorting
 - `--help, -h`: Show help message
 - `--version, -v`: Show version information
 

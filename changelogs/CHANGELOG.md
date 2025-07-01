@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2025-01-01
+
+### Added
+
+- **No-Sort Option**
+  - Added `--no-sort` option to create issues in file order without dependency sorting
+  - Allows bypassing dependency resolution when file order is preferred
+  - Useful for workflows that prioritize input file sequence over dependency constraints
+  - Still validates issue references to prevent creation of issues with non-existent dependencies
+
+### Improved
+
+- **Enhanced Dependency Sorting**
+  - Simplified dependency resolution to only consider `DependsOn` relationships
+  - Removed `Blocks` and `Related` relationships from ordering calculations for cleaner results
+  - Improved file order preservation within dependency levels
+  - Stable topological sorting that prioritizes original file order as primary criterion
+  - Better predictability and intuitive ordering of issues
+
+### Fixed
+
+- **File Order Stability**
+  - Fixed issue where INFRA-001~004 and similar sequential issues were separated
+  - Enhanced stable sorting algorithm to maintain file order when dependencies allow
+  - Reduced unexpected reordering of logically grouped issues
+  - Improved user experience with more predictable issue creation order
+
+### Technical Details
+
+- Modified dependency resolver to use position-based stable sorting
+- Implemented level-by-level processing to maintain file order precedence
+- Added GetOriginalOrder() method for no-sort functionality
+- Separated reference validation from dependency cycle detection for no-sort mode
+
 ## [0.3.0] - 2025-01-01
 
 ### Fixed
@@ -139,6 +173,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive error handling including circular dependency detection
 - Support for both GitHub CLI and API authentication methods
 
+[0.3.1]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.3.1
 [0.3.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.3.0
 [0.2.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.2.0
 [0.1.2]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.2
