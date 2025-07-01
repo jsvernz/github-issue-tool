@@ -2,7 +2,7 @@
 
 APP_NAME := github-issue-tool
 BUILD_DIR := bin
-MAIN_PATH := cmd/main.go
+MAIN_PATH := ./cmd/github-issue-tool
 
 # Default target
 all: build

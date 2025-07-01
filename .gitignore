@@ -15,7 +15,8 @@
 go.work
 
 # Binary
-github-issue-tool
+/github-issue-tool
+/bin/
 
 # IDE
 .idea/
