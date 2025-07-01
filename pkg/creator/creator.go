@@ -2,6 +2,7 @@ package creator
 
 import (
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/ef-tech/github-issue-tool/pkg/dependency"
@@ -169,7 +170,131 @@ func truncateString(s string, maxLen int) string {
 
 // ensureLabelsExist checks if labels exist and creates them if they don't
 func (c *Creator) ensureLabelsExist(labelClient github.LabelClient, labels []string) error {
-	// Default label configurations
+	for _, label := range labels {
+		exists, err := labelClient.LabelExists(label)
+		if err != nil {
+			return fmt.Errorf("failed to check if label %s exists: %w", label, err)
+		}
+
+		if !exists {
+			config, hasDefault := getDefaultLabelConfig(label)
+			var description, color string
+			
+			if hasDefault {
+				description = config.description
+				color = config.color
+			} else {
+				// Use generic defaults for unknown labels
+				description = fmt.Sprintf("Label: %s", label)
+				color = "cccccc"
+			}
+
+			fmt.Printf("         Creating missing label: %s\n", label)
+			if err := labelClient.CreateLabel(label, description, color); err != nil {
+				return fmt.Errorf("failed to create label %s: %w", label, err)
+			}
+		}
+	}
+
+	return nil
+}
+
+// CreateLabelsOnly extracts all unique labels from issues and creates them
+func (c *Creator) CreateLabelsOnly(issues []*github.Issue) (*Result, error) {
+	// Check if the client supports label operations
+	labelClient, ok := c.client.(github.LabelClient)
+	if !ok {
+		return nil, fmt.Errorf("the current GitHub client does not support label operations")
+	}
+
+	// Extract all unique labels
+	labelSet := make(map[string]bool)
+	for _, issue := range issues {
+		for _, label := range issue.Labels {
+			labelSet[label] = true
+		}
+	}
+
+	// Convert to slice and sort
+	var labels []string
+	for label := range labelSet {
+		labels = append(labels, label)
+	}
+	sort.Strings(labels)
+
+	fmt.Printf("Found %d unique labels to process\n\n", len(labels))
+
+	result := &Result{
+		CreatedIssues: make([]IssueResult, 0),
+		Errors:        make([]error, 0),
+	}
+
+	// Process labels
+	createdCount := 0
+	existingCount := 0
+
+	for i, label := range labels {
+		fmt.Printf("[%d/%d] Processing label: %s\n", i+1, len(labels), label)
+
+		if c.dryRun {
+			fmt.Printf("         [DRY RUN] Would check/create label: %s\n", label)
+			createdCount++
+		} else {
+			exists, err := labelClient.LabelExists(label)
+			if err != nil {
+				result.Errors = append(result.Errors, fmt.Errorf("failed to check if label %s exists: %w", label, err))
+				fmt.Printf("         ERROR: %v\n", err)
+				continue
+			}
+
+			if exists {
+				fmt.Printf("         Label already exists\n")
+				existingCount++
+			} else {
+				// Get label configuration
+				config, hasDefault := getDefaultLabelConfig(label)
+				var description, color string
+				
+				if hasDefault {
+					description = config.description
+					color = config.color
+				} else {
+					description = fmt.Sprintf("Label: %s", label)
+					color = "cccccc"
+				}
+
+				if err := labelClient.CreateLabel(label, description, color); err != nil {
+					result.Errors = append(result.Errors, fmt.Errorf("failed to create label %s: %w", label, err))
+					fmt.Printf("         ERROR: %v\n", err)
+					continue
+				}
+
+				fmt.Printf("         Created label with color #%s\n", color)
+				createdCount++
+			}
+		}
+
+		fmt.Println()
+	}
+
+	// Summary
+	if c.dryRun {
+		fmt.Printf("\n✅ Dry Run Summary:\n")
+		fmt.Printf("  - Total labels found: %d\n", len(labels))
+		fmt.Printf("  - Would create: %d\n", createdCount)
+	} else {
+		fmt.Printf("\n✅ Summary:\n")
+		fmt.Printf("  - Total labels found: %d\n", len(labels))
+		fmt.Printf("  - Already existed: %d\n", existingCount)
+		fmt.Printf("  - Created: %d\n", createdCount)
+		fmt.Printf("  - Errors: %d\n", len(result.Errors))
+	}
+
+	return result, nil
+}
+
+// getDefaultLabelConfig returns the default configuration for known labels
+func getDefaultLabelConfig(label string) (struct{ description, color string }, bool) {
 	defaultLabels := map[string]struct {
 		description string
 		color       string
@@ -195,31 +320,6 @@ func (c *Creator) ensureLabelsExist(labelClient github.LabelClient, labels []str
 		"testing":      {"Testing related", "d4edda"},
 	}
 
-	for _, label := range labels {
-		exists, err := labelClient.LabelExists(label)
-		if err != nil {
-			return fmt.Errorf("failed to check if label %s exists: %w", label, err)
-		}
-
-		if !exists {
-			config, hasDefault := defaultLabels[label]
-			var description, color string
-			
-			if hasDefault {
-				description = config.description
-				color = config.color
-			} else {
-				// Use generic defaults for unknown labels
-				description = fmt.Sprintf("Label: %s", label)
-				color = "cccccc"
-			}
-
-			fmt.Printf("         Creating missing label: %s\n", label)
-			if err := labelClient.CreateLabel(label, description, color); err != nil {
-				return fmt.Errorf("failed to create label %s: %w", label, err)
-			}
-		}
-	}
-
-	return nil
+	config, exists := defaultLabels[label]
+	return config, exists
 }

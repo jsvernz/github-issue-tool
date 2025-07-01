@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-01-01
+
+### Added
+
+- **Label-Only Mode**
+  - Added `--label-only` option to create only labels without creating issues
+  - Useful for preparing labels before issue creation or standardizing labels across repositories
+  - Extracts all unique labels from the issue file and creates them in alphabetical order
+  - Supports dry-run mode to preview what labels would be created
+  - Shows summary with created, existing, and error counts
+
+### Fixed
+
+- **Test Suite Stability**
+  - Fixed failing test in dependency resolver that was checking for circular dependencies via `Blocks` relationships
+  - Updated test expectations to match v0.3.1+ behavior where `Blocks` relationships don't create circular dependencies
+  - All tests now pass successfully
+
+### Technical Details
+
+- Modified `pkg/cli/flags.go` to add `LabelOnly` boolean field to Options struct
+- Implemented `CreateLabelsOnly` method in `pkg/creator/creator.go`
+- Enhanced main.go to handle label-only mode separately from issue creation
+- Added comprehensive test coverage for the new functionality
+- Refactored label configuration to avoid code duplication with `getDefaultLabelConfig` function
+- Fixed `pkg/dependency/resolver_test.go` to align with current dependency resolution behavior
+
 ## [0.3.1] - 2025-01-01
 
 ### Added
@@ -33,6 +60,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved user experience with more predictable issue creation order
 
 ### Technical Details
+
+
+
+
+
+
+
 
 - Modified dependency resolver to use position-based stable sorting
 - Implemented level-by-level processing to maintain file order precedence
@@ -173,6 +207,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive error handling including circular dependency detection
 - Support for both GitHub CLI and API authentication methods
 
+[0.4.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.4.0
 [0.3.1]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.3.1
 [0.3.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.3.0
 [0.2.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.2.0

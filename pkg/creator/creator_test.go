@@ -98,7 +98,7 @@ func TestCreator_ensureLabelsExist(t *testing.T) {
 			mockClient := NewMockLabelClient("owner", "repo")
 			mockClient.SetExistingLabels(tt.existingLabels)
 			
-			creator := NewCreator(mockClient, false)
+			creator := NewCreator(mockClient, false, false)
 			
 			err := creator.ensureLabelsExist(mockClient, tt.requestedLabels)
 			if err != nil {
@@ -129,7 +129,7 @@ func TestCreator_ensureLabelsExist(t *testing.T) {
 
 func TestCreator_ensureLabelsExist_DefaultConfigs(t *testing.T) {
 	mockClient := NewMockLabelClient("owner", "repo")
-	creator := NewCreator(mockClient, false)
+	creator := NewCreator(mockClient, false, false)
 	
 	// Test with a known default label
 	err := creator.ensureLabelsExist(mockClient, []string{"epic"})
@@ -157,7 +157,7 @@ func TestCreator_ensureLabelsExist_DefaultConfigs(t *testing.T) {
 
 func TestCreator_ensureLabelsExist_UnknownLabel(t *testing.T) {
 	mockClient := NewMockLabelClient("owner", "repo")
-	creator := NewCreator(mockClient, false)
+	creator := NewCreator(mockClient, false, false)
 	
 	// Test with an unknown label
 	err := creator.ensureLabelsExist(mockClient, []string{"unknown-custom-label"})
@@ -180,5 +180,152 @@ func TestCreator_ensureLabelsExist_UnknownLabel(t *testing.T) {
 	}
 	if created.Color != "cccccc" {
 		t.Errorf("Expected color 'cccccc', got '%s'", created.Color)
+	}
+}
+
+func TestCreator_CreateLabelsOnly(t *testing.T) {
+	tests := []struct {
+		name           string
+		issues         []*github.Issue
+		existingLabels []string
+		expectedCreated []string
+		dryRun         bool
+	}{
+		{
+			name: "extract unique labels from multiple issues",
+			issues: []*github.Issue{
+				{ID: "1", Title: "Issue 1", Labels: []string{"bug", "feature"}},
+				{ID: "2", Title: "Issue 2", Labels: []string{"bug", "epic"}},
+				{ID: "3", Title: "Issue 3", Labels: []string{"feature", "documentation"}},
+			},
+			existingLabels: []string{"bug"},
+			expectedCreated: []string{"documentation", "epic", "feature"}, // Sorted alphabetically
+			dryRun:         false,
+		},
+		{
+			name: "no labels to create",
+			issues: []*github.Issue{
+				{ID: "1", Title: "Issue 1", Labels: []string{"bug"}},
+				{ID: "2", Title: "Issue 2", Labels: []string{"bug"}},
+			},
+			existingLabels: []string{"bug"},
+			expectedCreated: []string{},
+			dryRun:         false,
+		},
+		{
+			name: "dry run mode",
+			issues: []*github.Issue{
+				{ID: "1", Title: "Issue 1", Labels: []string{"new-label-1", "new-label-2"}},
+			},
+			existingLabels: []string{},
+			expectedCreated: []string{}, // In dry run, no labels are actually created
+			dryRun:         true,
+		},
+		{
+			name:           "empty issues",
+			issues:         []*github.Issue{},
+			existingLabels: []string{},
+			expectedCreated: []string{},
+			dryRun:         false,
+		},
+		{
+			name: "issues with no labels",
+			issues: []*github.Issue{
+				{ID: "1", Title: "Issue 1", Labels: []string{}},
+				{ID: "2", Title: "Issue 2", Labels: nil},
+			},
+			existingLabels: []string{},
+			expectedCreated: []string{},
+			dryRun:         false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := NewMockLabelClient("owner", "repo")
+			mockClient.SetExistingLabels(tt.existingLabels)
+			
+			creator := NewCreator(mockClient, tt.dryRun, false)
+			
+			result, err := creator.CreateLabelsOnly(tt.issues)
+			if err != nil {
+				t.Errorf("CreateLabelsOnly() error = %v", err)
+				return
+			}
+			
+			if result == nil {
+				t.Errorf("CreateLabelsOnly() returned nil result")
+				return
+			}
+			
+			// Check that the expected labels were created
+			if !tt.dryRun {
+				if len(mockClient.createdLabels) != len(tt.expectedCreated) {
+					t.Errorf("Expected %d labels to be created, but %d were created", 
+						len(tt.expectedCreated), len(mockClient.createdLabels))
+					return
+				}
+				
+				createdNames := make([]string, len(mockClient.createdLabels))
+				for i, created := range mockClient.createdLabels {
+					createdNames[i] = created.Name
+				}
+				
+				for i, expected := range tt.expectedCreated {
+					if createdNames[i] != expected {
+						t.Errorf("Expected label %s at position %d, but got %s", expected, i, createdNames[i])
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestCreator_CreateLabelsOnly_WithDefaultConfigs(t *testing.T) {
+	mockClient := NewMockLabelClient("owner", "repo")
+	creator := NewCreator(mockClient, false, false)
+	
+	issues := []*github.Issue{
+		{ID: "1", Title: "Issue 1", Labels: []string{"epic", "unknown-label"}},
+	}
+	
+	result, err := creator.CreateLabelsOnly(issues)
+	if err != nil {
+		t.Errorf("CreateLabelsOnly() error = %v", err)
+		return
+	}
+	
+	if result == nil {
+		t.Errorf("CreateLabelsOnly() returned nil result")
+		return
+	}
+	
+	if len(mockClient.createdLabels) != 2 {
+		t.Errorf("Expected 2 labels to be created, but %d were created", len(mockClient.createdLabels))
+		return
+	}
+	
+	// Check epic label
+	epicLabel := mockClient.createdLabels[0]
+	if epicLabel.Name != "epic" {
+		t.Errorf("Expected first label name 'epic', got '%s'", epicLabel.Name)
+	}
+	if epicLabel.Description != "Epic issue" {
+		t.Errorf("Expected epic description 'Epic issue', got '%s'", epicLabel.Description)
+	}
+	if epicLabel.Color != "d73a4a" {
+		t.Errorf("Expected epic color 'd73a4a', got '%s'", epicLabel.Color)
+	}
+	
+	// Check unknown label
+	unknownLabel := mockClient.createdLabels[1]
+	if unknownLabel.Name != "unknown-label" {
+		t.Errorf("Expected second label name 'unknown-label', got '%s'", unknownLabel.Name)
+	}
+	if unknownLabel.Description != "Label: unknown-label" {
+		t.Errorf("Expected unknown label description 'Label: unknown-label', got '%s'", unknownLabel.Description)
+	}
+	if unknownLabel.Color != "cccccc" {
+		t.Errorf("Expected unknown label color 'cccccc', got '%s'", unknownLabel.Color)
 	}
 }

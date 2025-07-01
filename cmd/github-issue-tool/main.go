@@ -73,45 +73,69 @@ func main() {
 	// Create issue creator
 	issueCreator := creator.NewCreator(client, opts.DryRun, opts.NoSort)
 
-	if opts.DryRun {
-		fmt.Println("\n🔍 Running in dry-run mode (no issues will be created)")
+	if opts.LabelOnly {
+		// Label-only mode
+		if opts.DryRun {
+			fmt.Println("\n🔍 Running in dry-run mode (no labels will be created)")
+		} else {
+			fmt.Println("\n🏷️  Creating labels only...")
+		}
+
+		result, err := issueCreator.CreateLabelsOnly(issues)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error creating labels: %v\n", err)
+			os.Exit(1)
+		}
+
+		if len(result.Errors) > 0 {
+			fmt.Printf("\n❌ Errors:\n")
+			for _, err := range result.Errors {
+				fmt.Printf("  - %v\n", err)
+			}
+			os.Exit(1)
+		}
 	} else {
-		fmt.Println("\n🚀 Creating issues...")
-	}
-	
-	if opts.NoSort {
-		fmt.Println("📝 Creating issues in file order (dependency sorting disabled)")
-	}
+		// Normal issue creation mode
+		if opts.DryRun {
+			fmt.Println("\n🔍 Running in dry-run mode (no issues will be created)")
+		} else {
+			fmt.Println("\n🚀 Creating issues...")
+		}
+		
+		if opts.NoSort {
+			fmt.Println("📝 Creating issues in file order (dependency sorting disabled)")
+		}
 
-	// Create issues
-	result, err := issueCreator.CreateIssues(issues)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating issues: %v\n", err)
-		os.Exit(1)
-	}
+		// Create issues
+		result, err := issueCreator.CreateIssues(issues)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error creating issues: %v\n", err)
+			os.Exit(1)
+		}
 
-	// Print results
-	fmt.Printf("\n✅ Summary:\n")
-	fmt.Printf("  - Total issues processed: %d\n", len(issues))
-	fmt.Printf("  - Successfully created: %d\n", len(result.CreatedIssues))
-	fmt.Printf("  - Errors: %d\n", len(result.Errors))
+		// Print results
+		fmt.Printf("\n✅ Summary:\n")
+		fmt.Printf("  - Total issues processed: %d\n", len(issues))
+		fmt.Printf("  - Successfully created: %d\n", len(result.CreatedIssues))
+		fmt.Printf("  - Errors: %d\n", len(result.Errors))
 
-	if len(result.CreatedIssues) > 0 {
-		fmt.Printf("\n📋 Created Issues:\n")
-		for _, issue := range result.CreatedIssues {
-			if opts.DryRun {
-				fmt.Printf("  - [%s] #%d: %s (DRY RUN)\n", issue.ID, issue.Number, issue.Title)
-			} else {
-				fmt.Printf("  - [%s] #%d: %s - %s\n", issue.ID, issue.Number, issue.Title, issue.URL)
+		if len(result.CreatedIssues) > 0 {
+			fmt.Printf("\n📋 Created Issues:\n")
+			for _, issue := range result.CreatedIssues {
+				if opts.DryRun {
+					fmt.Printf("  - [%s] #%d: %s (DRY RUN)\n", issue.ID, issue.Number, issue.Title)
+				} else {
+					fmt.Printf("  - [%s] #%d: %s - %s\n", issue.ID, issue.Number, issue.Title, issue.URL)
+				}
 			}
 		}
-	}
 
-	if len(result.Errors) > 0 {
-		fmt.Printf("\n❌ Errors:\n")
-		for _, err := range result.Errors {
-			fmt.Printf("  - %v\n", err)
+		if len(result.Errors) > 0 {
+			fmt.Printf("\n❌ Errors:\n")
+			for _, err := range result.Errors {
+				fmt.Printf("  - %v\n", err)
+			}
+			os.Exit(1)
 		}
-		os.Exit(1)
 	}
 }

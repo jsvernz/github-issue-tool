@@ -5,6 +5,33 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.0.0/) に基づいており、
 このプロジェクトは [セマンティック バージョニング](https://semver.org/spec/v2.0.0.html) に準拠しています。
 
+## [0.4.0] - 2025-01-01
+
+### 追加機能
+
+- **ラベルのみモード**
+  - issueを作成せずにラベルのみを作成する`--label-only`オプションを追加
+  - issue作成前のラベル準備やリポジトリ間でのラベル標準化に有用
+  - issueファイルから全ての一意なラベルを抽出し、アルファベット順に作成
+  - 作成されるラベルをプレビューするドライランモードをサポート
+  - 作成済み、既存、エラー数を含むサマリーを表示
+
+### 修正
+
+- **テストスイートの安定化**
+  - `Blocks`関係による循環依存をチェックしていた依存関係リゾルバーの失敗テストを修正
+  - v0.3.1以降の動作に合わせてテスト期待値を更新（`Blocks`関係は循環依存を作成しない）
+  - すべてのテストが正常に通過するようになりました
+
+### 技術的詳細
+
+- `pkg/cli/flags.go`を修正してOptions構造体に`LabelOnly`ブールフィールドを追加
+- `pkg/creator/creator.go`に`CreateLabelsOnly`メソッドを実装
+- main.goを拡張してissue作成とは別にラベルのみモードを処理
+- 新機能の包括的なテストカバレッジを追加
+- `getDefaultLabelConfig`関数でコード重複を避けるためラベル設定をリファクタリング
+- `pkg/dependency/resolver_test.go`を現在の依存関係解決動作に合わせて修正
+
 ## [0.3.1] - 2025-01-01
 
 ### 追加機能
@@ -173,6 +200,7 @@
 - 循環依存検出を含む包括的なエラーハンドリング
 - GitHub CLIとAPI認証方法の両方のサポート
 
+[0.4.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.4.0
 [0.3.1]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.3.1
 [0.3.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.3.0
 [0.2.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.2.0

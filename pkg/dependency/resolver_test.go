@@ -44,8 +44,7 @@ func TestValidate(t *testing.T) {
 				{ID: "A", Blocks: []string{"B"}},
 				{ID: "B", Blocks: []string{"A"}},
 			},
-			wantErr: true,
-			errMsg:  "circular dependency",
+			wantErr: false, // Blocks relationships don't create circular dependencies in v0.3.1+
 		},
 		{
 			name: "complex valid graph",

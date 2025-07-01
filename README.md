@@ -10,6 +10,7 @@ A smart CLI tool for bulk creation of GitHub issues with dependency management.
 - **Dependency Management**: Supports `Depends`, `Blocks`, and `Related` relationships between issues
 - **Smart Creation Order**: Automatically optimizes creation order based on dependencies
 - **Automatic Label Creation**: Automatically creates missing labels with predefined colors and descriptions
+- **Label-Only Mode**: Create only labels without creating issues (v0.4.0+)
 - **Repository Targeting**: Specify target repository with `--repo` option
 - **Dry Run Mode**: Preview what will be created before actually creating issues
 - **Progress Display**: Shows detailed progress and error handling
@@ -49,6 +50,9 @@ github-issue-tool -f issues.txt -n
 
 # Create issues in file order without dependency sorting
 github-issue-tool --file issues.txt --no-sort
+
+# Create only labels without creating issues
+github-issue-tool --file issues.txt --label-only
 ```
 
 ### Command Line Options
@@ -57,6 +61,7 @@ github-issue-tool --file issues.txt --no-sort
 - `--repo`: Target repository in `owner/name` format (optional)
 - `--dry-run, -n`: Perform a dry run without creating issues
 - `--no-sort`: Create issues in file order without dependency sorting
+- `--label-only`: Create only labels without creating issues
 - `--help, -h`: Show help message
 - `--version, -v`: Show version information
 
@@ -97,7 +102,24 @@ Another issue body.
 
 ### Automatic Label Creation
 
-The tool automatically creates missing labels when they don't exist in the target repository. It includes predefined configurations for common labels:
+The tool automatically creates missing labels when they don't exist in the target repository. It includes predefined configurations for common labels.
+
+#### Label-Only Mode
+
+With the `--label-only` option (v0.4.0+), you can create all labels found in the issue file without creating the issues themselves. This is useful for:
+- Preparing labels before issue creation
+- Standardizing labels across repositories
+- Testing label configurations
+
+```bash
+# Create only labels from the issue file
+github-issue-tool --file issues.txt --label-only
+
+# Dry run to see what labels would be created
+github-issue-tool --file issues.txt --label-only --dry-run
+```
+
+#### Predefined Label Configurations:
 
 **Priority Labels:**
 - `priority-high` (Red: #b60205)
