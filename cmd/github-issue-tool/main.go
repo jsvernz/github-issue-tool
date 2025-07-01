@@ -71,12 +71,16 @@ func main() {
 	}
 
 	// Create issue creator
-	issueCreator := creator.NewCreator(client, opts.DryRun)
+	issueCreator := creator.NewCreator(client, opts.DryRun, opts.NoSort)
 
 	if opts.DryRun {
 		fmt.Println("\n🔍 Running in dry-run mode (no issues will be created)")
 	} else {
 		fmt.Println("\n🚀 Creating issues...")
+	}
+	
+	if opts.NoSort {
+		fmt.Println("📝 Creating issues in file order (dependency sorting disabled)")
 	}
 
 	// Create issues

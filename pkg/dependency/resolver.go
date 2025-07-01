@@ -175,6 +175,41 @@ func (r *Resolver) GetCreationOrder() ([]*github.Issue, error) {
 	return result, nil
 }
 
+// GetOriginalOrder returns issues in their original file order without dependency sorting
+func (r *Resolver) GetOriginalOrder() ([]*github.Issue, error) {
+	// Still validate to check for missing references, but don't enforce dependency order
+	if err := r.validateReferences(); err != nil {
+		return nil, err
+	}
+
+	// Return issues in their original order
+	return r.issues, nil
+}
+
+// validateReferences checks for missing references without dependency cycle validation
+func (r *Resolver) validateReferences() error {
+	// Check for missing dependencies
+	for _, issue := range r.issues {
+		for _, depID := range issue.DependsOn {
+			if _, exists := r.idToIssue[depID]; !exists {
+				return fmt.Errorf("issue %s depends on non-existent issue %s", issue.ID, depID)
+			}
+		}
+		for _, blockID := range issue.Blocks {
+			if _, exists := r.idToIssue[blockID]; !exists {
+				return fmt.Errorf("issue %s blocks non-existent issue %s", issue.ID, blockID)
+			}
+		}
+		for _, relID := range issue.Related {
+			if _, exists := r.idToIssue[relID]; !exists {
+				return fmt.Errorf("issue %s relates to non-existent issue %s", issue.ID, relID)
+			}
+		}
+	}
+
+	return nil
+}
+
 // GetDependencyInfo returns a string describing the dependencies for an issue
 func (r *Resolver) GetDependencyInfo(issue *github.Issue) string {
 	info := ""

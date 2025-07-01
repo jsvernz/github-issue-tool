@@ -11,6 +11,7 @@ import (
 type Creator struct {
 	client github.Client
 	dryRun bool
+	noSort bool
 }
 
 type Result struct {
@@ -25,19 +26,30 @@ type IssueResult struct {
 	URL    string
 }
 
-func NewCreator(client github.Client, dryRun bool) *Creator {
+func NewCreator(client github.Client, dryRun bool, noSort bool) *Creator {
 	return &Creator{
 		client: client,
 		dryRun: dryRun,
+		noSort: noSort,
 	}
 }
 
 func (c *Creator) CreateIssues(issues []*github.Issue) (*Result, error) {
 	// Resolve dependencies and get creation order
 	resolver := dependency.NewResolver(issues)
-	orderedIssues, err := resolver.GetCreationOrder()
-	if err != nil {
-		return nil, fmt.Errorf("failed to resolve dependencies: %w", err)
+	var orderedIssues []*github.Issue
+	var err error
+	
+	if c.noSort {
+		orderedIssues, err = resolver.GetOriginalOrder()
+		if err != nil {
+			return nil, fmt.Errorf("failed to validate issue references: %w", err)
+		}
+	} else {
+		orderedIssues, err = resolver.GetCreationOrder()
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve dependencies: %w", err)
+		}
 	}
 
 	result := &Result{
@@ -48,7 +60,11 @@ func (c *Creator) CreateIssues(issues []*github.Issue) (*Result, error) {
 	// Track issue ID to number mapping for dependency comments
 	issueNumberMap := make(map[string]int)
 
-	fmt.Printf("Creating %d issues in dependency order:\n\n", len(orderedIssues))
+	if c.noSort {
+		fmt.Printf("Creating %d issues in file order:\n\n", len(orderedIssues))
+	} else {
+		fmt.Printf("Creating %d issues in dependency order:\n\n", len(orderedIssues))
+	}
 
 	for i, issue := range orderedIssues {
 		fmt.Printf("[%d/%d] Creating issue: %s - %s\n", i+1, len(orderedIssues), issue.ID, issue.Title)
