@@ -5,6 +5,23 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.0.0/) に基づいており、
 このプロジェクトは [セマンティック バージョニング](https://semver.org/spec/v2.0.0.html) に準拠しています。
 
+## [0.1.1] - 2025-01-01
+
+### 修正
+
+- **Go Installコマンドの互換性**
+  - `go install`コマンドが正しく動作するようにディレクトリ構造を修正
+  - Goの慣例に従い`cmd/main.go`を`cmd/github-issue-tool/main.go`に移動
+  - Makefileとドキュメントのビルドパスを更新
+  - `.gitignore`が必要な`cmd/github-issue-tool/`ディレクトリを除外しないように修正
+  - ユーザーは`go install github.com/ef-tech/github-issue-tool/cmd/github-issue-tool@latest`を使用してツールを直接インストールできるようになりました
+
+### 技術的詳細
+
+- この問題は、`main.go`が`cmd/`ディレクトリに直接配置されていた非標準的なコマンド構造によって発生していました
+- Goの`install`コマンドは、メインパッケージがバイナリ名と一致するサブディレクトリにあることを期待します
+- この修正により、標準的なGoツールとパッケージ管理との互換性が確保されます
+
 ## [0.1.0] - 2025-01-01
 
 ### 追加機能
@@ -51,4 +68,5 @@
 - 循環依存検出を含む包括的なエラーハンドリング
 - GitHub CLIとAPI認証方法の両方のサポート
 
+[0.1.1]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.1
 [0.1.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.0

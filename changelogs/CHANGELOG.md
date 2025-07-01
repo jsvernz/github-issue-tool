@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2025-01-01
+
+### Fixed
+
+- **Go Install Command Compatibility**
+  - Fixed directory structure to support `go install` command properly
+  - Moved `cmd/main.go` to `cmd/github-issue-tool/main.go` following Go conventions
+  - Updated build paths in Makefile and documentation
+  - Ensured `.gitignore` does not exclude the required `cmd/github-issue-tool/` directory
+  - Users can now install the tool directly using `go install github.com/ef-tech/github-issue-tool/cmd/github-issue-tool@latest`
+
+### Technical Details
+
+- The issue was caused by the non-standard command structure where `main.go` was placed directly in the `cmd/` directory
+- Go's `install` command expects the main package to be in a subdirectory matching the binary name
+- This fix ensures compatibility with standard Go tooling and package management
+
 ## [0.1.0] - 2025-01-01
 
 ### Added
@@ -51,4 +68,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive error handling including circular dependency detection
 - Support for both GitHub CLI and API authentication methods
 
+[0.1.1]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.1
 [0.1.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.0
