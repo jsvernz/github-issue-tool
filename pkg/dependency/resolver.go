@@ -128,11 +128,11 @@ func (r *Resolver) GetCreationOrder() ([]*github.Issue, error) {
 		}
 	}
 
-	// Find all nodes with no incoming edges
+	// Find all nodes with no incoming edges (preserve original order)
 	queue := []string{}
-	for id, degree := range inDegree {
-		if degree == 0 {
-			queue = append(queue, id)
+	for _, issue := range r.issues {
+		if inDegree[issue.ID] == 0 {
+			queue = append(queue, issue.ID)
 		}
 	}
 
@@ -147,11 +147,22 @@ func (r *Resolver) GetCreationOrder() ([]*github.Issue, error) {
 		result = append(result, r.idToIssue[current])
 		processedCount++
 
-		// Reduce in-degree for neighbors
+		// Reduce in-degree for neighbors (preserve original order)
+		readyNodes := []string{}
 		for _, neighbor := range adjList[current] {
 			inDegree[neighbor]--
 			if inDegree[neighbor] == 0 {
-				queue = append(queue, neighbor)
+				readyNodes = append(readyNodes, neighbor)
+			}
+		}
+		
+		// Add ready nodes in original file order
+		for _, issue := range r.issues {
+			for _, ready := range readyNodes {
+				if issue.ID == ready {
+					queue = append(queue, ready)
+					break
+				}
 			}
 		}
 	}
