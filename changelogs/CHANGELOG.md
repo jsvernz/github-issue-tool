@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Supports dry-run mode to preview what labels would be created
   - Shows summary with created, existing, and error counts
 
+### Fixed
+
+- **Test Suite Stability**
+  - Fixed failing test in dependency resolver that was checking for circular dependencies via `Blocks` relationships
+  - Updated test expectations to match v0.3.1+ behavior where `Blocks` relationships don't create circular dependencies
+  - All tests now pass successfully
+
 ### Technical Details
 
 - Modified `pkg/cli/flags.go` to add `LabelOnly` boolean field to Options struct
@@ -23,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced main.go to handle label-only mode separately from issue creation
 - Added comprehensive test coverage for the new functionality
 - Refactored label configuration to avoid code duplication with `getDefaultLabelConfig` function
+- Fixed `pkg/dependency/resolver_test.go` to align with current dependency resolution behavior
 
 ## [0.3.1] - 2025-01-01
 
@@ -52,6 +60,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved user experience with more predictable issue creation order
 
 ### Technical Details
+
+
+
+
+
+
+
 
 - Modified dependency resolver to use position-based stable sorting
 - Implemented level-by-level processing to maintain file order precedence
