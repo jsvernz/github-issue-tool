@@ -51,9 +51,10 @@ func (c *CLIClient) CreateIssue(issue *Issue) error {
 	
 	// Execute the command
 	cmd := exec.Command("gh", args...)
-	output, err := cmd.Output()
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("failed to create issue %s: %w", issue.ID, err)
+		// Include both the error and the command output for debugging
+		return fmt.Errorf("failed to create issue %s: %w (output: %s)", issue.ID, err, string(output))
 	}
 	
 	// Parse the issue number from the output
@@ -112,9 +113,9 @@ func (c *CLIClient) AddComment(issueNumber int, comment string) error {
 	args = append(args, "--body", comment)
 	
 	cmd := exec.Command("gh", args...)
-	_, err := cmd.Output()
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("failed to add comment to issue %d: %w", issueNumber, err)
+		return fmt.Errorf("failed to add comment to issue %d: %w (output: %s)", issueNumber, err, string(output))
 	}
 	
 	return nil

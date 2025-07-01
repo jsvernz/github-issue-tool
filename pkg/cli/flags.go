@@ -14,6 +14,7 @@ type Options struct {
 	DryRun    bool
 	ShowHelp  bool
 	ShowVersion bool
+	Repository string
 }
 
 func ParseFlags() (*Options, error) {
@@ -27,6 +28,7 @@ func ParseFlags() (*Options, error) {
 	flag.BoolVar(&opts.ShowHelp, "h", false, "Show help message (short form)")
 	flag.BoolVar(&opts.ShowVersion, "version", false, "Show version information")
 	flag.BoolVar(&opts.ShowVersion, "v", false, "Show version information (short form)")
+	flag.StringVar(&opts.Repository, "repo", "", "Target repository (owner/name format)")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "%s - %s\n\n", config.AppName, config.AppDesc)
