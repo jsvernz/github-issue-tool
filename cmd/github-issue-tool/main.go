@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ef-tech/github-issue-tool/pkg/cli"
 	"github.com/ef-tech/github-issue-tool/pkg/creator"
@@ -46,12 +47,27 @@ func main() {
 
 	fmt.Printf("Loaded %d issues from file\n", len(issues))
 
+	// Determine repository owner and name
+	var owner, name string
+	if opts.Repository != "" {
+		// Use explicitly specified repository
+		parts := strings.Split(opts.Repository, "/")
+		if len(parts) != 2 {
+			fmt.Fprintf(os.Stderr, "Error: Repository must be in 'owner/name' format\n")
+			os.Exit(1)
+		}
+		owner, name = parts[0], parts[1]
+	} else {
+		// Use detected repository from environment
+		owner, name = env.RepositoryOwner, env.RepositoryName
+	}
+
 	// Create GitHub client
 	var client github.Client
 	if env.PreferredMethod == "cli" {
-		client = github.NewCLIClient(env.RepositoryOwner, env.RepositoryName)
+		client = github.NewCLIClient(owner, name)
 	} else {
-		client = github.NewAPIClient(env.RepositoryOwner, env.RepositoryName, "")
+		client = github.NewAPIClient(owner, name, "")
 	}
 
 	// Create issue creator

@@ -2,6 +2,6 @@ package config
 
 const (
 	AppName    = "github-issue-tool"
-	AppVersion = "0.1.2"
+	AppVersion = "0.2.0"
 	AppDesc    = "A smart CLI tool for bulk creation of GitHub issues with dependency management"
 )
