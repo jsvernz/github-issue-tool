@@ -196,7 +196,10 @@ github-issue-tool/
 │   ├── config/          # Configuration and version
 │   └── cli/             # CLI flag parsing
 ├── examples/            # Usage examples
-└── docs/               # Additional documentation
+├── docs/               # Additional documentation
+└── changelogs/         # Release history
+    ├── CHANGELOG.md     # English changelog
+    └── CHANGELOG_ja.md  # Japanese changelog
 ```
 
 ### Building
