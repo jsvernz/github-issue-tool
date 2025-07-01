@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-01-01
+
+### Fixed
+
+- **Issue Creation Order Stability**
+  - Fixed non-deterministic issue creation order caused by Go map iteration
+  - Issues with no dependencies are now created in the order they appear in the input file
+  - Maintains original file order when resolving dependencies, only reordering when necessary
+  - Ensures consistent and predictable issue creation order across multiple runs
+
+### Technical Details
+
+- Modified the dependency resolver to preserve original issue order when building the initial queue
+- Changed from iterating over maps to iterating over the original issue slice
+- When new nodes become available for processing after dependency resolution, they are added in file order
+- This fix addresses the issue where independent issues (e.g., INFRA-001) were being created in random positions
+
 ## [0.2.0] - 2025-01-01
 
 ### Added
@@ -122,6 +139,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive error handling including circular dependency detection
 - Support for both GitHub CLI and API authentication methods
 
+[0.3.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.3.0
 [0.2.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.2.0
 [0.1.2]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.2
 [0.1.1]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.1

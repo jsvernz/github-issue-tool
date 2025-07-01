@@ -5,6 +5,23 @@
 フォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.0.0/) に基づいており、
 このプロジェクトは [セマンティック バージョニング](https://semver.org/spec/v2.0.0.html) に準拠しています。
 
+## [0.3.0] - 2025-01-01
+
+### 修正
+
+- **Issue作成順序の安定化**
+  - Goのmap反復による非決定的なissue作成順序を修正
+  - 依存関係のないissueは入力ファイルに記載された順序で作成されるようになりました
+  - 依存関係の解決時に元のファイル順序を維持し、必要な場合のみ順序を変更
+  - 複数回の実行にわたって一貫した予測可能なissue作成順序を保証
+
+### 技術的詳細
+
+- 初期キューの構築時に元のissue順序を保持するように依存関係リゾルバを修正
+- mapの反復から元のissueスライスの反復に変更
+- 依存関係解決後に新しいノードが処理可能になった場合、ファイル順序で追加
+- この修正により、独立したissue（例：INFRA-001）がランダムな位置に作成される問題を解決
+
 ## [0.2.0] - 2025-01-01
 
 ### 追加機能
@@ -122,6 +139,7 @@
 - 循環依存検出を含む包括的なエラーハンドリング
 - GitHub CLIとAPI認証方法の両方のサポート
 
+[0.3.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.3.0
 [0.2.0]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.2.0
 [0.1.2]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.2
 [0.1.1]: https://github.com/ef-tech/github-issue-tool/releases/tag/v0.1.1
